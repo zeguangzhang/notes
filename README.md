@@ -1,4 +1,3 @@
 # notes
 IT青年兵的所见所得
-testa
-ab
+历经java python go
