@@ -1,0 +1,7 @@
+##查看文件提交历史
+git log {文件名}
+是more命令打开，要了解基本的more命令翻页（上一页或者上一页），上一页cral+b 下一页 空格键
+
+参考链接：
+git :https://www.cnblogs.com/flyme/archive/2011/11/28/2265899.html
+more:https://www.cnblogs.com/cocoajin/p/3741016.html

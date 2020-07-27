@@ -1,0 +1,5 @@
+mongo启动命令：
+sudo systemctl start mongod.service
+
+redis启动命令
+看官网 https://redis.io/download
