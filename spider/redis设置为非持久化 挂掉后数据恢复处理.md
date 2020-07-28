@@ -68,6 +68,48 @@ cat  url2.json| grep -v "www.120ask.com/question" | awk -F '"url":"|"}' '{print 
 cat url0.url url1.url url2.url > urlall.url
 ```
 
+
+
+### redis配置持久化，解决上次持久化问题。
+--解决持久化保存失败问题，为什么redis在运行一段时间后会出现save失败(当时程序写redis错误时去redis命令行模式下去写入一样，然后想赶紧save吧，这是save一直失败)，
+导致客户端只能只读不可写的问题。其实就在最近几天遇到的一个磁盘空间导致tab命令快捷键出问题，于是想到了可能是这个问题，就是redis保存的目录存储空间不够导致。
+
+--看机器磁盘整体目录资源大小划分结构 df -h
+```angular2
+文件系统                                                   容量  已用  可用 已用% 挂载点
+devtmpfs                                                    32G     0   32G    0% /dev
+tmpfs                                                       32G   20K   32G    1% /dev/shm
+tmpfs                                                       32G  3.2G   29G   10% /run
+tmpfs                                                       32G     0   32G    0% /sys/fs/cgroup
+/dev/sda2                                                   30G   24G  5.6G   82% /
+/dev/sda1                                                  497M  109M  389M   22% /boot
+//baikemypdfs1.file.core.chinacloudapi.cn/baikemypdfs1sh1 1000G  416G  585G   42% /data/repository
+/dev/sdb1                                                   79G   57M   75G    1% /mnt/resource
+tmpfs                                                      6.3G     0  6.3G    0% /run/user/0
+/dev/sdc1                                                 1007G  225G  731G   24% /data
+tmpfs                                                      6.3G     0  6.3G    0% /run/user/1003
+tmpfs                                                      6.3G     0  6.3G    0% /run/user/1004
+```
+可以看到 挂载点/data目录空间比较大，决定redis dump文件保存在该目录下
+于是修改了redis配置文件修改 dir
+```
+# The working directory.
+#
+# The DB will be written inside this directory, with the filename specified
+# above using the 'dbfilename' configuration directive.
+#
+# The Append Only File will also be created inside this directory.
+#
+# Note that you must specify a directory here, not a file name.
+dir /data/zhangzeguang/redis/
+```
+
+
+
+
+
+
+
 -写一个python脚本把这些url信息写入redis去重队列
 
 
