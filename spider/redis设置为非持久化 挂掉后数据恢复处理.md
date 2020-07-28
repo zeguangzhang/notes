@@ -103,13 +103,13 @@ tmpfs                                                      6.3G     0  6.3G    0
 # Note that you must specify a directory here, not a file name.
 dir /data/zhangzeguang/redis/
 ```
-
-
-
-
-
+执行上面操作后，后续又发现问题->解决方法：
+1 redis 下面的配置文件修改后(修改dir)不生效 -> redis启动手动指定配置文件路径 src/redis-server ./redis.conf &
+2 执行后save还是失败，因为保存目录不在用户目录 -> 需要sudo
+3 但是sudo后启动了2个进程，kill掉一个就都kill掉了 因为当前redis执行文件目录在用户目录下，而redis dir参数是在/data/目录下，所以启动了两个 -> redis整个目录拷贝到非用户目录（/data）下ok
 
 
 -写一个python脚本把这些url信息写入redis去重队列
+
 
 
