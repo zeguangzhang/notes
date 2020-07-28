@@ -105,8 +105,9 @@ dir /data/zhangzeguang/redis/
 ```
 执行上面操作后，后续又发现问题->解决方法：
 - redis 下面的配置文件修改后(修改dir)不生效 -> redis启动手动指定配置文件路径 src/redis-server ./redis.conf &
-- 执行后save还是失败，因为保存目录不在用户目录 -> 需要sudo
-- 但是sudo后启动了2个进程，kill掉一个就都kill掉了 因为当前redis执行文件目录在用户目录下，而redis dir参数是在/data/目录下，所以启动了两个 -> redis整个目录拷贝到非用户目录（/data）下ok
+- 执行后save还是失败，因为保存的dump文件目录没权限 -> 需要sudo
+- 但是sudo后启动了2个进程，kill掉sudo没问题，但是kill非sudo的就都会挂掉，能不用不用sudo
+- 把指向的dump文件直接授权777ok 非sudo启动可以
 
 
 -写一个python脚本把这些url信息写入redis去重队列
