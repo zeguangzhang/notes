@@ -12,27 +12,24 @@
 采用持久化内容做为恢复数据的根本，把持久化的信息url放入去重队列，然后在放入新的种子放入待下载队列。
 
 ###恢复过程：
-url读取：
+-url读取：
 mongoexport --collection=scrapy_items --db=crawl_ask1 --fields=url --out=./url1.json
-awk分割（多字符分割）：
+
 eg: mongo导出的的原始信息 分为三个数据库分别导出
 
 ```
 db1:
 {"_id":{"$oid":"5eba756968dc172742f085f6"},"url":"https://www.120ask.com/question/41691482.htm"}
+...
+...
 {"_id":{"$oid":"5eba756968dc172742f085f7"},"url":"https://www.120ask.com/question/40605309.htm"}
-{"_id":{"$oid":"5eba756a68dc172742f085f8"},"url":"https://www.120ask.com/question/40387879.htm"}
-{"_id":{"$oid":"5eba756a68dc172742f085f9"},"url":"https://www.120ask.com/question/41038497.htm"}
-{"_id":{"$oid":"5eba756a68dc172742f085fa"},"url":"https://www.120ask.com/question/41218237.htm"}
-{"_id":{"$oid":"5eba756a68dc172742f085fb"},"url":"https://www.120ask.com/question/41095016.htm"}
-{"_id":{"$oid":"5eba756a68dc172742f085fc"},"url":"https://www.120ask.com/question/41139860.htm"}
-{"_id":{"$oid":"5eba756a68dc172742f085fd"},"url":"https://www.120ask.com/question/70115549.htm"}
 
 db2:
 {"_id":{"$oid":"5eba756a68dc172742f085fe"},"url":"https://www.120ask.com/question/11614458.htm"}
 {"_id":{"$oid":"5eba756a68dc172742f085ff"},"url":"https://www.120ask.com/question/70591891.htm"}
 ...
 ...
+//由于修改程序原因，下面url会变成这样
 {"_id":{"$oid":"5f0de49e20a91a8ef13093b1"},"url":"62262866"}
 {"_id":{"$oid":"5f0de49e20a91a8ef13093b2"},"url":"88166"}
 {"_id":{"$oid":"5f0de49e20a91a8ef13093b3"},"url":"998743"}
@@ -40,19 +37,23 @@ db2:
 db3:
 {"_id":{"$oid":"5f0de49e20a91a8ef13093b4"},"url":"68225137"}
 {"_id":{"$oid":"5f0de49e20a91a8ef13093b5"},"url":"18915738"}
-{"_id":{"$oid":"5f0de49e20a91a8ef13093b6"},"url":"10967930"}
-{"_id":{"$oid":"5f0de49e20a91a8ef13093b7"},"url":"13084422"}
-{"_id":{"$oid":"5f0de49e20a91a8ef13093b8"},"url":"50042921"}
+...
 {"_id":{"$oid":"5f0de49e20a91a8ef13093b9"},"url":"68351238"}
 ```
 
-
-
+-awk分割（多字符分割）：
 注意下awk可以多字符分割 一次分割出来 参考链接：https://blog.csdn.net/BigBirds911/article/details/54382682
 ```
 
 cat url0.json| awk -F 'www.120ask.com/question/|.htm' '{print $2}'  
-cat url1.json| grep "https://www.120ask.com/question" | awk -F 'www.120ask.com/question/|.htm' '{print $2}' >url1part1.url 
- cat url1.json| grep -v "https://www.120ask.com/question" | awk -F '"url":"|"}' '{print $2}' >url1part2.url
 
+cat url1.json| grep "www.120ask.com/question" | awk -F 'www.120ask.com/question/|.htm' '{print $2}' >url1part1.url 
+cat  url1.json| grep -v "www.120ask.com/question" | awk -F '"url":"|"}' '{print $3}' >url1part2.url
+cat url1part* > url1.url
+
+cat  url2.json| grep -v "www.120ask.com/question" | awk -F '"url":"|"}' '{print $3}' >url2.url
+
+最终merge:
+cat url0.url url1.url url2.url > urlall.url
 ```
+
