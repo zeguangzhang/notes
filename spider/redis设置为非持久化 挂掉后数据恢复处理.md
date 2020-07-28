@@ -1,6 +1,17 @@
 ##前提
 因为一次大意把redis默认的持久化改成了非持久化配置，当时没有持久化的原因是redis保存一直报错，导致只能读取，不能写入操作，所以一时半会没找到解决方法，放着侥幸心里把redis
 持久化配置干掉
+### redis配置文件怎样不持久化
+```
+-增加一条这个
+save ""
+-下面注释掉
+#save 900 1
+#save 300 10
+#save 60 10000
+
+就这么简单
+```
 
 ##出现的问题
 但是运行一段时间应用都退出了，最终发现redis挂掉了，由于没有持久化导致redis启动后数据全无
@@ -56,4 +67,7 @@ cat  url2.json| grep -v "www.120ask.com/question" | awk -F '"url":"|"}' '{print 
 最终merge:
 cat url0.url url1.url url2.url > urlall.url
 ```
+
+-写一个python脚本把这些url信息写入redis去重队列
+
 
