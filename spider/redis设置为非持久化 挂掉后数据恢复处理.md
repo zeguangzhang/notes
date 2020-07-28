@@ -15,8 +15,10 @@
 url读取：
 mongoexport --collection=scrapy_items --db=crawl_ask1 --fields=url --out=./url1.json
 awk分割（多字符分割）：
-eg: mongo导出的的原始信息
+eg: mongo导出的的原始信息 分为三个数据库分别导出
+
 ```
+db1:
 {"_id":{"$oid":"5eba756968dc172742f085f6"},"url":"https://www.120ask.com/question/41691482.htm"}
 {"_id":{"$oid":"5eba756968dc172742f085f7"},"url":"https://www.120ask.com/question/40605309.htm"}
 {"_id":{"$oid":"5eba756a68dc172742f085f8"},"url":"https://www.120ask.com/question/40387879.htm"}
@@ -25,13 +27,32 @@ eg: mongo导出的的原始信息
 {"_id":{"$oid":"5eba756a68dc172742f085fb"},"url":"https://www.120ask.com/question/41095016.htm"}
 {"_id":{"$oid":"5eba756a68dc172742f085fc"},"url":"https://www.120ask.com/question/41139860.htm"}
 {"_id":{"$oid":"5eba756a68dc172742f085fd"},"url":"https://www.120ask.com/question/70115549.htm"}
+
+db2:
 {"_id":{"$oid":"5eba756a68dc172742f085fe"},"url":"https://www.120ask.com/question/11614458.htm"}
 {"_id":{"$oid":"5eba756a68dc172742f085ff"},"url":"https://www.120ask.com/question/70591891.htm"}
-```
-注意下awk可以多字符分割 一次分割出来
-```
-参考链接：https://blog.csdn.net/BigBirds911/article/details/54382682
-head url0.json| awk -F 'www.120ask.com/question/|.htm' '{print $2}'  
+...
+...
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b1"},"url":"62262866"}
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b2"},"url":"88166"}
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b3"},"url":"998743"}
 
+db3:
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b4"},"url":"68225137"}
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b5"},"url":"18915738"}
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b6"},"url":"10967930"}
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b7"},"url":"13084422"}
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b8"},"url":"50042921"}
+{"_id":{"$oid":"5f0de49e20a91a8ef13093b9"},"url":"68351238"}
+```
+
+
+
+注意下awk可以多字符分割 一次分割出来 参考链接：https://blog.csdn.net/BigBirds911/article/details/54382682
+```
+
+cat url0.json| awk -F 'www.120ask.com/question/|.htm' '{print $2}'  
+cat url1.json| grep "https://www.120ask.com/question" | awk -F 'www.120ask.com/question/|.htm' '{print $2}' >url1part1.url 
+ cat url1.json| grep -v "https://www.120ask.com/question" | awk -F '"url":"|"}' '{print $2}' >url1part2.url
 
 ```
