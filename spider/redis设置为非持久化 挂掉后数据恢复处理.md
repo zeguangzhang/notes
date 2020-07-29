@@ -13,16 +13,16 @@ save ""
 就这么简单
 ```
 
-##出现的问题
+## 出现的问题
 但是运行一段时间应用都退出了，最终发现redis挂掉了，由于没有持久化导致redis启动后数据全无
 
-##出现了上述问题 恢复过程
+## 出现了上述问题 恢复过程
 ### 恢复思路
 爬虫主要有4部分信息是重要的：去重信息，待下载队列，待解析队列(前面这三种都在redis)，持久化部分（我这里是mongo）
 由于前三种信息都在redis中导致这些信息全无，如果全部想恢复是不能恢复了（由于每次下载放入队列的url没有用日志打出，因为着实没必要打印这个）。所以
 采用持久化内容做为恢复数据的根本，把持久化的信息url放入去重队列，然后在放入新的种子放入待下载队列。
 
-###恢复过程：
+### 恢复过程：
 -url读取：
 mongoexport --collection=scrapy_items --db=crawl_ask1 --fields=url --out=./url1.json
 
@@ -109,13 +109,34 @@ dir /data/zhangzeguang/redis/
 - 但是sudo后启动了2个进程（两个线上kill很有意思的现象：kill掉sudo没问题，但是kill非sudo的就都会挂掉），linux sudo运行原来会启动两个进程，这块后期调研下原因
 
 
+### 写一个python脚本把这些url信息写入redis去重队列
+```
+import re
+import redis
 
+#offline config
+redis_ip = 'localhost'
+redis_port = 6379
+redis_password = 'test123'
 
--写一个python脚本把这些url信息写入redis去重队列
+pool = redis.ConnectionPool(host=redis_ip, port=redis_port, password=redis_password, decode_responses=True)   # host是redis主机，需要redis服务端和客户端都起着 redis默认端口是6379
+redis_cli = redis.Redis(connection_pool=pool)
+CRAWLED_KEY = "ask_crawl_dup"
+
+if __name__ == '__main__':
+    with open("/data/urlall.url", 'rt') as f:
+        for line in f.readlines():
+            if line:
+                print(line.strip())
+                redis_cli.sadd(CRAWLED_KEY, line.strip())
+
+```
+由于上面单线程操作redis保存了1400万url数据到redis,也需要一小时时间。
 
 
 ## 给自己留一手
 ### redis在线修改配置怎么办？
+
 
 
 ### redis save一次需要多久
@@ -192,6 +213,10 @@ eg:redis启动后开始一段时间 执行任何命令结果：
 used_memory:18929506352
 used_memory_human:17.63G
 发现没有变，确定了不是做内存优化，那原因其实就确定了，就是磁盘速度读取速度比写入速度快导致。
+
+- 后台保存按理花费时间也很长，如果一次还没保存完，下一次保存的请求又来了怎么处理？
+可以调研一下，我估计应该是如果有就取消保存任务，或者用一个消息队列，消息队列长度是1，后来的自动覆盖前面的保存消息，
+应该是采用后面策略，前面直接取消不靠谱。
 
 
 
