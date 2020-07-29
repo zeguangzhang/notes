@@ -135,11 +135,11 @@ if __name__ == '__main__':
 
 ### 执行java爬取程序 充分利用java并发
 如果java代码有改动 先项目根目录执行 mvn clean package 
-java -jar jar/path/jar位置
+nohup java -jar jar/path/jar位置 &
 
 ### 启动python解析程序 
-python3.7 path/parse_many.py 
-python3.7 path/difflast/parse_many.py 
+nohup python3.7 path/parse_many.py  &
+nohup python3.7 path/difflast/parse_many.py &
 我这里启动了2个解析程序，也就是2个消费者，经过实际测试2个消费者正好能处理生产者发过来的信息
 
 ## 给自己留一手
@@ -150,6 +150,7 @@ python3.7 path/difflast/parse_many.py
 ### redis save一次需要多久
 redis现在内存信息：
 - 执行： info memory
+```
 # Memory
 used_memory:18929541016
 used_memory_human:17.63G
@@ -191,6 +192,7 @@ mem_aof_buffer:0
 mem_allocator:jemalloc-5.1.0
 active_defrag_running:0
 lazyfree_pending_objects:0
+```
 
 - 登录redis客户端 执行save 故意save了2次（主要想看平均值）看下效果
 127.0.0.1:6379> save
@@ -217,9 +219,12 @@ eg:redis启动后开始一段时间 执行任何命令结果：
 
 不过从上面可以看出redis启动加载到磁盘比保存在磁盘的save要快很多。一个近300秒一个180秒,
 那是什么原因呢，难道是重新加载进来的会内存优化之类的，我们先去看看redis内存信息：
+```
 # Memory
 used_memory:18929506352
 used_memory_human:17.63G
+```
+
 发现没有变，确定了不是做内存优化，那原因其实就确定了，就是磁盘速度读取速度比写入速度快导致。
 
 - 后台保存按理花费时间也很长，如果一次还没保存完，下一次保存的请求又来了怎么处理？
