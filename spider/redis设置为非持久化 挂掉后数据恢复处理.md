@@ -131,8 +131,16 @@ if __name__ == '__main__':
                 redis_cli.sadd(CRAWLED_KEY, line.strip())
 
 ```
-由于上面单线程操作redis保存了1400万url数据到redis,也需要一小时时间。
+由于上面单线程操作redis保存了1400万url数据到redis,实测也需要约1.5小时。
 
+### 执行java爬取程序 充分利用java并发
+如果java代码有改动 先项目根目录执行 mvn clean package 
+java -jar jar/path/jar位置
+
+### 启动python解析程序 
+python3.7 path/parse_many.py 
+python3.7 path/difflast/parse_many.py 
+我这里启动了2个解析程序，也就是2个消费者，经过实际测试2个消费者正好能处理生产者发过来的信息
 
 ## 给自己留一手
 ### redis在线修改配置怎么办？
