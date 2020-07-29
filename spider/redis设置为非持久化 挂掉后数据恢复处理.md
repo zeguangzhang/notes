@@ -186,6 +186,13 @@ eg:redis启动后开始一段时间 执行任何命令结果：
 31311:M 29 Jul 2020 11:20:03.923 * DB loaded from disk: 180.411 seconds
 31311:M 29 Jul 2020 11:20:03.923 * Ready to accept connections
 
+不过从上面可以看出redis启动加载到磁盘比保存在磁盘的save要快很多。一个近300秒一个180秒,
+那是什么原因呢，难道是重新加载进来的会内存优化之类的，我们先去看看redis内存信息：
+# Memory
+used_memory:18929506352
+used_memory_human:17.63G
+发现没有变，确定了不是做内存优化，那原因其实就确定了，就是磁盘速度读取速度比写入速度快导致。
+
 
 
 
