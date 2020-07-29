@@ -171,7 +171,21 @@ OK
 OK
 (283.63s)
 
-从上面可以看到17.63G内容save需要
+从上面可以看到17.63G内容save需要近5分钟时间，也就是说一分钟可持久化近3.5g内容，如果是线上服务就很要命的(在save期间不允许读写操作，连接redis都不可以)。
+这种手动调用是同步save，在配置文件中的save策略是异步策略。不会影响线上读写操作，但还是会浪费机器资源的。
+但是保存在dump.rdb中会进行快照压缩，最终持久化文件大小为5.6G：
+-rw-r--r--  1 root         root         5.6G 7月  29 10:45 dump.rdb
+可见压缩率还是可观的
+
+- redis设置为持久化后，redis重启后会自动加载持久化内容到硬盘，时间跟save时间等同
+eg:redis启动后开始一段时间 执行任何命令结果：
+127.0.0.1:6379> keys *
+(error) LOADING Redis is loading the dataset in memory
+(0.60s)
+这是因为redis还没有启动起来：只有当redis启动日志出现 Ready to accept connections才算启动成功，如下：
+31311:M 29 Jul 2020 11:20:03.923 * DB loaded from disk: 180.411 seconds
+31311:M 29 Jul 2020 11:20:03.923 * Ready to accept connections
+
 
 
 
