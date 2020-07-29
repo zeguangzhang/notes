@@ -106,11 +106,74 @@ dir /data/zhangzeguang/redis/
 执行上面操作后，后续又发现问题->解决方法：
 - redis 下面的配置文件修改后(修改dir)不生效 -> redis启动手动指定配置文件路径 src/redis-server ./redis.conf &
 - 执行后save还是失败，因为保存的dump文件目录没权限 -> 需要sudo
-- 但是sudo后启动了2个进程，kill掉sudo没问题，但是kill非sudo的就都会挂掉，能不用不用sudo
-- 把指向的dump文件直接授权777ok 非sudo启动可以
+- 但是sudo后启动了2个进程（两个线上kill很有意思的现象：kill掉sudo没问题，但是kill非sudo的就都会挂掉），linux sudo运行原来会启动两个进程，这块后期调研下原因
+
+
 
 
 -写一个python脚本把这些url信息写入redis去重队列
+
+
+## 给自己留一手
+### redis在线修改配置怎么办？
+
+
+### redis save一次需要多久
+redis现在内存信息：
+- 执行： info memory
+# Memory
+used_memory:18929541016
+used_memory_human:17.63G
+used_memory_rss:18539913216
+used_memory_rss_human:17.27G
+used_memory_peak:19293846864
+used_memory_peak_human:17.97G
+used_memory_peak_perc:98.11%
+used_memory_overhead:841462
+used_memory_startup:791392
+used_memory_dataset:18928699554
+used_memory_dataset_perc:100.00%
+allocator_allocated:18929816600
+allocator_active:19857002496
+allocator_resident:19957665792
+total_system_memory:67540705280
+total_system_memory_human:62.90G
+used_memory_lua:37888
+used_memory_lua_human:37.00K
+used_memory_scripts:0
+used_memory_scripts_human:0B
+number_of_cached_scripts:0
+maxmemory:0
+maxmemory_human:0B
+maxmemory_policy:noeviction
+allocator_frag_ratio:1.05
+allocator_frag_bytes:927185896
+allocator_rss_ratio:1.01
+allocator_rss_bytes:100663296
+rss_overhead_ratio:0.93
+rss_overhead_bytes:-1417752576
+mem_fragmentation_ratio:0.98
+mem_fragmentation_bytes:-389586776
+mem_not_counted_for_evict:0
+mem_replication_backlog:0
+mem_clients_slaves:0
+mem_clients_normal:49694
+mem_aof_buffer:0
+mem_allocator:jemalloc-5.1.0
+active_defrag_running:0
+lazyfree_pending_objects:0
+
+- 登录redis客户端 执行save 故意save了2次（主要想看平均值）看下效果
+127.0.0.1:6379> save
+OK
+(299.99s)
+127.0.0.1:6379> save
+OK
+(283.63s)
+
+从上面可以看到17.63G内容save需要
+
+
 
 
 
