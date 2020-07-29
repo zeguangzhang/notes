@@ -144,8 +144,21 @@ nohup python3.7 path/difflast/parse_many.py &
 
 ## 给自己留一手
 ### redis在线修改配置怎么办？
+从redis官网找到了信息：redis提供了redis运行状态下修改配置操作，config 命令：
+详细参考redis官网这部分介绍：
+链接：https://redis.io/topics/config
+```
+Changing Redis configuration while the server is running
+It is possible to reconfigure Redis on the fly without stopping and restarting the service, or querying the current configuration programmatically using the special commands CONFIG SET and CONFIG GET
+Not all the configuration directives are supported in this way, but most are supported as expected. Please refer to the CONFIG SET and CONFIG GET pages for more information.
+Note that modifying the configuration on the fly has no effects on the redis.conf file so at the next restart of Redis the old configuration will be used instead.
+Make sure to also modify the redis.conf file accordingly to the configuration you set using CONFIG SET. You can do it manually, or starting with Redis 2.8, you can just use CONFIG REWRITE, 
+which will automatically scan your redis.conf file and update the fields which don't match the current configuration value. 
+Fields non existing but set to the default value are not added. Comments inside your configuration file are retained.
 
-
+```
+其实为什么提到了这个问题，是因为上面持久化过程中忘记修改持久化配置搞成持久化了，所以利用该特性实现了fly模式下的配置修改，实现了持久化。
+如果手动修改配置文件，是不生效的，只能重启才能生效，但是这样重启内存数据就全无了。
 
 ### redis save一次需要多久
 redis现在内存信息：
