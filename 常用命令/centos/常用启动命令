@@ -1,5 +1,16 @@
+平时业务需求，可能会用到各种中间件的一些启动停止等基本命令：为了省去每次忘记还要去百度的时间，特写本篇内容
+
 mongo启动命令：
 sudo systemctl start mongod.service
+mongo停止命令：
+sudo systemctl stop mongod.service
+mongo状态查看：
+sudo systemctl status mongod.service
+
+参考下面链接，写的很棒：
+https://blog.csdn.net/zqx1205/article/details/75330320
 
 redis启动命令
+下载redis官网看都是推荐这种下载源码后手动编译后运行的方式。
 看官网 https://redis.io/download
+
